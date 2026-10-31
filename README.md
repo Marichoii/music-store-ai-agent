@@ -5,7 +5,7 @@ technical challenge.
 
 ## The challenge
 
-Music Store is a fictional musical instrument store in Campo Grande, Brazil.
+Music Store is a fictional musical instrument store in Brasília, Brazil.
 Its team handles recurring customer questions about products, prices, availability
 and store policies.
 
