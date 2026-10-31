@@ -10,16 +10,9 @@ Customer replies follow the latest message's language, including mid-conversatio
 switches. Language-neutral follow-ups keep the last established customer language.
 Product names and source identifiers stay unchanged.
 
-```bash
-uv sync --locked --extra dev
-uv run python -m music_store --check-config
-uv run python -m music_store
-```
-
-Create `.env` from `.env.example` if missing and set `GEMINI_API_KEY`.
-`GEMINI_MODEL` is configurable. The HTTP interface is documented in [api.md](api.md).
-Configuration checks make no model requests. Chat sends messages and relevant
-source context to Google and consumes API quota.
+Set `GEMINI_API_KEY` and optionally `GEMINI_MODEL` in `.env`.
+The HTTP interface is documented in [api.md](api.md). Chat sends messages and
+relevant source context to Google and consumes API quota.
 
 Each conversation owns its history. Complete Gemini contents and thought signatures
 are retained for up to eight turns. Failed turns are discarded. Each turn permits

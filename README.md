@@ -35,6 +35,16 @@ Open [API docs](http://127.0.0.1:8000/docs). Details: [API usage](docs/api.md).
 
 Record real [conversation examples](examples/README.md) through the running API.
 
+## Checks
+
+```bash
+uv run pytest -q
+uv run ruff check .
+```
+
+Technical details: [agent](docs/agent.md), [data](data/README.md) and
+[policy assumptions](docs/policies.md).
+
 ## AI assistance
 
 OpenAI Codex supports planning, coding, tests and documentation.

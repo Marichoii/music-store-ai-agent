@@ -25,14 +25,3 @@ and unresolved manual conditions.
 
 Product 144 is named Roland, but its description mentions Yamaha. Both fields are
 preserved. Searches, product lookups and quotes include an explicit warning.
-
-## Example
-
-```python
-from music_store.catalog import Catalog
-
-quote = Catalog.load().get_quote(121, payment_method="pix")
-print(quote.price.unit_price_brl)
-```
-
-Tests: `uv run pytest -q`.

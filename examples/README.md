@@ -16,5 +16,4 @@ recording. Failures stop the run and leave an `incomplete` recording.
 
 Review the answers against the original sources. `complete` means every HTTP
 request succeeded, not that the answers were independently verified. Include
-three to five complete conversations in the submission. No generated examples
-have been committed yet; the recorder's offline tests use simulated responses.
+three to five complete conversations in the submission.

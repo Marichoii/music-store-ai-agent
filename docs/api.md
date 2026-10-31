@@ -1,11 +1,7 @@
 # API
 
-```bash
-uv sync --locked --extra dev
-uv run uvicorn music_store.api:app --host 127.0.0.1 --port 8000 --workers 1
-```
-
-Set `GEMINI_API_KEY` in `.env`. OpenAPI: `/docs` or `/openapi.json`.
+Start the server following the [README](../README.md#run).
+OpenAPI: `/docs` or `/openapi.json`.
 
 | Endpoint | Purpose |
 | --- | --- |
@@ -32,6 +28,5 @@ Invalid inputs return 422, unknown/expired sessions 404, configuration/authentic
 errors 503, upstream quota errors 429 and other provider failures 502. Error details
 include the session ID when a conversation was created, allowing a retry.
 
-HTTP tests use simulated agent/provider responses. Manual Gemini smoke tests covered
-catalog search and a PIX follow-up; submission recordings are still pending. See
-[conversation examples](../examples/README.md). The command-line chat is also available.
+HTTP tests use simulated agent/provider responses. Record real
+[conversation examples](../examples/README.md) through the running API.
