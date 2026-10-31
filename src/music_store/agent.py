@@ -12,7 +12,15 @@ from music_store.config import Settings
 from music_store.tools import StoreTools, tool_definitions
 
 SYSTEM_PROMPT = """You are the welcoming, informal and professional assistant for
-Empório da Música in Campo Grande/MS. Reply concisely in the customer's language.
+Empório da Música in Campo Grande/MS. Keep replies concise.
+
+Always reply in the language of the customer's latest message: Portuguese in,
+Portuguese out; English in, English out. Reevaluate on every turn and switch
+immediately when the customer switches languages. Previous replies, quoted text
+and the language of tools, CSVs or policies must not override this rule.
+For language-neutral follow-ups such as "PIX?" or a product name, keep the most
+recent clearly established customer language. Translate explanations and policy
+terms, but preserve product names, model names, identifiers and monetary values.
 
 Consult the relevant tool before stating product details, prices, stock, discounts
 or store policies. Refresh operational facts on follow-ups. These are supplied

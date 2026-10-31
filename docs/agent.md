@@ -6,6 +6,10 @@ Pydantic validates arguments before execution; the SDK never executes tools dire
 Search results contain prices, availability and source warnings. Full descriptions
 and specifications are retrieved with `get_product` when needed.
 
+Customer replies follow the latest message's language, including mid-conversation
+switches. Language-neutral follow-ups keep the last established customer language.
+Product names and source identifiers stay unchanged.
+
 ```bash
 uv sync --locked --extra dev
 uv run python -m music_store --check-config
