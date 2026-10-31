@@ -1,4 +1,4 @@
-"""Read the complete supplied policy manual without dropping pages or rewriting it."""
+"""Load the store manual with page references."""
 
 import re
 from pathlib import Path
@@ -12,53 +12,40 @@ from music_store.models import Record
 
 POLICY_NOTES = {
     "contacts": (
-        "The cover and section 1.2 (pp. 1–2) give (67) 3341-4444; section 7 (p. 6) "
-        "gives WhatsApp (67) 3321-4500. Email spellings also differ. "
-        "Report the source conflict; neither contact is verified by this application."
+        "Contacts conflict: (67) 3341-4444 (pp. 1–2) versus WhatsApp "
+        "(67) 3321-4500 (p. 6). Email spellings also differ; neither contact is verified."
     ),
     "installments": (
-        "Section 3 (p. 3) gives a BRL 100 installment minimum, but section 3.1 permits "
-        "lower detailed tiers. The application provisionally uses BRL 50 for 2–3 payments, "
-        "BRL 80 for 4–6, and BRL 100 for 7–12. The BRL 50 exception is interpreted as "
-        "a per-installment floor. Plans conflicting with the general minimum require "
-        "store confirmation. A single credit payment is treated as non-installment."
+        "Sections 3 and 3.1 (p. 3) conflict. Provisionally use per-payment minima of "
+        "BRL 50 for 2–3x, BRL 80 for 4–6x and BRL 100 for 7–12x. Plans below the "
+        "general BRL 100 minimum require confirmation. Single payments have no floor."
     ),
     "shipping": (
-        "Section 5.1 (p. 4) defines local freight strictly above/below BRL 500, "
-        "leaving exactly BRL 500 unspecified. The pre/post-discount threshold basis is "
-        "also unspecified. Ask for store confirmation when relevant. Section 5.2 (p. 5) "
-        "requires destination, weight and dimensions for other cities, and large items "
-        "may need individual quotes. No carrier quotation, postal coverage validation "
-        "or exact arrival-date calculation is connected. Published windows are estimates."
+        "Local freight leaves exactly BRL 500 unspecified; the pre/post-discount "
+        "threshold basis is also missing (§5.1, p. 4). Other cities and large items "
+        "need quotes (§5.2, p. 5). No carrier quotation or coverage lookup is connected. "
+        "Delivery windows are estimates."
     ),
     "returns": (
-        "Online regret is described in section 4.1 (p. 4) as 7 calendar days from receipt. "
-        "Section 4.3 gives 7 days for preference exchanges but no explicit starting event. "
-        "Sections 4.4, 4.1 and 8 can overlap: customized/final-sale exclusions must not "
-        "be turned into a categorical denial of a return or defect/warranty request. "
-        "Ask missing purchase, timing, reason and condition facts, explain the supplied "
-        "manual, and request human review for ambiguous cases. Do not give an independent "
-        "legal opinion. A clearance campaign alone is not an explicit final-sale notice."
+        "Online regret: 7 calendar days from receipt (§4.1, p. 4). Preference exchanges "
+        "have no explicit starting event (§4.3). Overlapping customized, final-sale and "
+        "defect rules need human review, not a categorical denial. Ask for missing facts. "
+        "Clearance campaigns do not establish final-sale status."
     ),
     "warranty": (
-        "Distinguish the manual's 30-day store defect-exchange process from purchase "
-        "(section 4.2, p. 4) and its 90-day warranty counted from receipt "
-        "(section 8.1, p. 7). Manufacturer-specific certificates are absent; "
-        "do not assign an exact manufacturer warranty to a particular product."
+        "Store defect exchange: 30 days from purchase (§4.2, p. 4). The manual's "
+        "90-day warranty starts at receipt (§8.1, p. 7). Manufacturer-specific terms "
+        "require a certificate."
     ),
     "identity_and_location": (
-        "The source manual describes Empório da Música in Campo Grande/MS (pp. 1–2). "
-        "Keep those source facts intact. A project label or a different city in other "
-        "context does not establish a replacement address or extend the manual's local "
-        "shipping region. Clarify location conflicts before applying regional conditions."
+        "Empório da Música is in Campo Grande/MS (pp. 1–2). Local shipping rules "
+        "apply to its metropolitan region; do not infer coverage for other cities."
     ),
     "scope_and_actions": (
-        "The manual's 300+ instruments (p. 2) is not the queryable snapshot count of 65. "
-        "No accessories or partner store names are supplied. The prototype has no "
-        "order lookup, authenticated customer access, reservation, purchase, refund, "
-        "complaint registration, human handoff or personal-data deletion capability. "
-        "It can explain procedures, but must not claim to have performed those actions. "
-        "No holiday or special-opening calendar is connected."
+        "Only 65 product records are queryable; the manual's 300+ claim is not inventory "
+        "evidence. Accessories are not sold. No order lookup, write actions or holiday "
+        "calendar is connected. The assistant must not claim to have performed purchases, "
+        "refunds, reservations, complaint registration, handoffs or data deletion."
     ),
 }
 

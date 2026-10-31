@@ -1,4 +1,4 @@
-"""Validated source records and monetary results shared by the catalog and pricing."""
+"""Catalog and payment models."""
 
 import json
 from datetime import date

@@ -44,7 +44,7 @@ def test_source_location_and_conflicting_contacts_are_not_rewritten(policies):
     assert "3321-4500" in pages[5].text
     notes = policies.context()["implementation_notes"]
     assert "neither contact is verified" in notes["contacts"]
-    assert "Clarify location conflicts" in notes["identity_and_location"]
+    assert "Empório da Música is in Campo Grande/MS" in notes["identity_and_location"]
 
 
 def test_policy_gaps_and_unsupported_actions_are_explicit(policies):

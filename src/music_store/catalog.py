@@ -1,4 +1,4 @@
-"""Read and query the supplied musical instrument catalog."""
+"""Load and search the catalog."""
 
 import csv
 import unicodedata

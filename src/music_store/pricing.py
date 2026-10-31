@@ -1,4 +1,4 @@
-"""Calculate quotes from source data without stacking discounts or using floats."""
+"""Calculate prices and quotes."""
 
 from collections.abc import Iterable
 from decimal import ROUND_HALF_UP, Decimal

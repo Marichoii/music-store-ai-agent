@@ -1,4 +1,4 @@
-"""Payment calculations with explicit handling of the manual's conflicting minima."""
+"""Calculate payment terms."""
 
 from decimal import Decimal, InvalidOperation
 
