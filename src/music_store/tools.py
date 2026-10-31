@@ -10,6 +10,18 @@ from music_store.models import PaymentMethod, Product
 from music_store.policies import PolicyBook
 from music_store.pricing import price_for
 
+PRODUCT_DATA_NOTES = {
+    144: (
+        "The product name identifies Roland, but its description identifies Yamaha. "
+        "The source does not resolve the conflict; confirm the brand/model with the store."
+    ),
+}
+
+
+def data_quality_notes(product: Product) -> list[str]:
+    note = PRODUCT_DATA_NOTES.get(product.product_id)
+    return [note] if note else []
+
 
 class ToolInputError(ValueError):
     pass
@@ -49,7 +61,8 @@ TOOL_TYPES = {
     ),
     "search_catalog": (
         SearchArguments,
-        "Search by source-language keywords, category, availability and effective budget.",
+        "Search by source-language keywords, category, availability and effective budget. "
+        "Returns compact results; use get_product for descriptions and specifications.",
     ),
     "get_product": (
         ProductArguments,
@@ -96,12 +109,16 @@ class StoreTools:
         self.catalog = catalog
         self.policies = policies
 
-    def describe(self, product: Product, method: PaymentMethod = "standard") -> dict:
+    def describe(
+        self, product: Product, method: PaymentMethod = "standard", *, summary: bool = False
+    ) -> dict:
+        excluded = {"description", "specs", "created_at", "price_brl"} if summary else None
         return {
-            **product.model_dump(mode="json"),
+            **product.model_dump(mode="json", exclude=excluded),
             "category": self.catalog.categories[product.category_id].name,
             "availability": product.availability,
             "price": price_for(product, self.catalog.promotions, method).model_dump(mode="json"),
+            "data_quality_notes": data_quality_notes(product),
             "source": f"products.csv, product_id={product.product_id}; promotions.csv",
         }
 
@@ -132,7 +149,8 @@ class StoreTools:
         )
         return {
             "products": [
-                self.describe(product, args.payment_method) for product in products[: args.limit]
+                self.describe(product, args.payment_method, summary=True)
+                for product in products[: args.limit]
             ],
             "total_matches": len(products),
             "truncated": len(products) > args.limit,
@@ -192,6 +210,7 @@ class StoreTools:
         return {
             "status": "quoted",
             **quote.model_dump(mode="json"),
+            "data_quality_notes": data_quality_notes(product),
             "source": "products.csv; promotions.csv; manual sections 3 and 6.2, pp. 3, 6",
             "action": "Read-only quote; no order or reservation created.",
         }

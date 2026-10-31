@@ -33,6 +33,8 @@ uv run uvicorn music_store.api:app --host 127.0.0.1 --port 8000 --workers 1
 
 Open [API docs](http://127.0.0.1:8000/docs). Details: [API usage](docs/api.md).
 
+Record real [conversation examples](examples/README.md) through the running API.
+
 ## AI assistance
 
 OpenAI Codex supports planning, coding, tests and documentation.

@@ -32,5 +32,6 @@ Invalid inputs return 422, unknown/expired sessions 404, configuration/authentic
 errors 503, upstream quota errors 429 and other provider failures 502. Error details
 include the session ID when a conversation was created, allowing a retry.
 
-HTTP tests use simulated agent/provider responses. Real Gemini validation remains
-pending. The command-line chat is still available as an alternative.
+HTTP tests use simulated agent/provider responses. Manual Gemini smoke tests covered
+catalog search and a PIX follow-up; submission recordings are still pending. See
+[conversation examples](../examples/README.md). The command-line chat is also available.

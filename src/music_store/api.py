@@ -5,7 +5,7 @@ from typing import Literal
 from uuid import UUID
 
 from fastapi import FastAPI, HTTPException, Response
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 from music_store.agent import StoreAgent, create_client
@@ -17,9 +17,17 @@ from music_store.tools import StoreTools
 
 
 class ChatRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    model_config = ConfigDict(
+        extra="forbid",
+        str_strip_whitespace=True,
+        json_schema_extra={
+            "examples": [{"message": "Which nylon-string guitars do you have under R$700?"}]
+        },
+    )
     message: str = Field(min_length=1, max_length=4000)
-    session_id: UUID | None = None
+    session_id: UUID | None = Field(
+        default=None, description="Omit for a new chat; reuse the returned ID for follow-ups."
+    )
 
 
 class ChatResponse(BaseModel):
@@ -63,6 +71,10 @@ def create_app(
                 client.close()
 
     application = FastAPI(title="Empório da Música API", version="0.1.0", lifespan=lifespan)
+
+    @application.get("/", include_in_schema=False)
+    def index() -> RedirectResponse:
+        return RedirectResponse("/docs")
 
     @application.exception_handler(SessionError)
     def session_error(request, exc: SessionError):

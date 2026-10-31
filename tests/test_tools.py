@@ -20,6 +20,34 @@ def test_search_uses_effective_price_and_returns_sources(store_tools):
     assert call(store_tools, "search_catalog", limit=1)["data"]["truncated"]
 
 
+def test_search_preserves_matching_and_full_details_remain_available(store_tools):
+    result = call(store_tools, "search_catalog", query="nylon", max_price_brl="700")["data"]
+    products = result["products"]
+    assert products
+    for summary in products:
+        product = call(store_tools, "get_product", query=str(summary["product_id"]))["data"][
+            "product"
+        ]
+        assert product["specs"]["strings"] == "nylon"
+        assert product["description"]
+        assert summary["price"] == product["price"]
+        assert summary["stock_quantity"] == product["stock_quantity"]
+        assert summary["availability"] == product["availability"]
+        assert "description" not in summary and "specs" not in summary
+
+
+def test_conflicting_product_is_flagged_in_search_details_and_quotes(store_tools):
+    summary = call(store_tools, "search_catalog", query="Roland Synth 3")["data"]["products"][0]
+    product = call(store_tools, "get_product", query="144")["data"]["product"]
+    quote = call(store_tools, "quote_product", product_id=144)["data"]
+    assert product["name"] == "Teclado Sintetizador Roland Synth 3 Pro"
+    assert "Yamaha" in product["description"]
+    assert summary["data_quality_notes"] == product["data_quality_notes"]
+    assert quote["data_quality_notes"] == product["data_quality_notes"]
+    assert "confirm" in quote["data_quality_notes"][0]
+    assert not call(store_tools, "get_product", query="81")["data"]["product"]["data_quality_notes"]
+
+
 def test_unknown_empty_and_ambiguous_products_are_distinct(store_tools):
     assert call(store_tools, "get_product", query="99999")["data"]["status"] == "not_found"
     result = call(store_tools, "get_product", query="Yamaha")["data"]

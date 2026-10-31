@@ -3,6 +3,8 @@
 The agent uses the official Google Gen AI SDK and `gemini-3.5-flash-lite`.
 Five read-only tools handle categories, search, product lookup, quotes and policies.
 Pydantic validates arguments before execution; the SDK never executes tools directly.
+Search results contain prices, availability and source warnings. Full descriptions
+and specifications are retrieved with `get_product` when needed.
 
 ```bash
 uv sync --locked --extra dev

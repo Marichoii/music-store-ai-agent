@@ -24,7 +24,7 @@ and unresolved manual conditions.
 ## Source inconsistency
 
 Product 144 is named Roland, but its description mentions Yamaha. Both fields are
-preserved. Identify products by ID and name; flag conflicting details.
+preserved. Searches, product lookups and quotes include an explicit warning.
 
 ## Example
 
