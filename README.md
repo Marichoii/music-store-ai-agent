@@ -1,34 +1,36 @@
 # Empório da Música — customer-service assistant
 
-Python prototype for the Artefact AI Engineer technical challenge.
+Project for Artefact's **AI Engineer — Full-Stack for Generative AI Applications**
+technical challenge.
 
-## Current stage
+## The challenge
 
-The Python package and development environment are configured. Catalog queries,
-pricing rules, policy consultation, Gemini integration and the chat interface will
-be added in separate steps. No assistant or real model calls are implemented yet.
+Empório da Música is a fictional musical instrument store in Campo Grande, Brazil.
+Its team handles recurring customer questions about products, prices, availability
+and store policies.
 
-This branch reconstructs the project from its initial commit. The previously
-completed prototype remains preserved on `prototype-backup`.
+The challenge is to build a Python customer-service agent that answers text
+messages using the supplied operational CSV files and store policy manual.
 
-## Development setup
+## Expected behavior
 
-Use Python 3.12 and uv. From this branch's working directory:
+- Use a welcoming, informal and professional tone.
+- Help customers find instruments by category, budget and availability.
+- Consult product data before providing prices, stock or active promotions.
+- Explain opening hours, payment methods, delivery, exchanges and returns using
+  the store's policies.
+- Maintain context for follow-up questions.
+- Recognize requests outside the store's scope and acknowledge missing or
+  ambiguous information.
 
-```bash
-uv sync --locked --extra dev
-uv run python -c "import music_store; print('Package import OK')"
-uv run ruff check .
-uv run ruff format --check .
-```
+## Planned approach
 
-`pyproject.toml` defines the package and development tools. `uv.lock` records the
-resolved dependency versions. Runtime dependencies will be added when needed.
-
-Local `.env` files and virtual environments are excluded from Git. Keep real API
-keys in `.env`; never add them to example files or commits.
+The application will use **Python**, **Gemini** for language understanding and tool
+calling, and **Streamlit** for a simple chat interface. Python functions will query
+the supplied data and apply pricing rules. The policy manual will provide the
+reference for answers about store procedures.
 
 ## AI assistance
 
-OpenAI Codex assists with implementation, automated verification and documentation.
-Candidate review and real Gemini validation will be recorded only after they occur.
+OpenAI Codex is used to support planning, implementation, automated checks and
+documentation.
