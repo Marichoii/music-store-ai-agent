@@ -1,0 +1,18 @@
+{
+  "archive_name": "Desafio_Técnico_AI_Engineer_2026-20260616T150750Z-3-001.zip",
+  "archive_sha256": "9bf6eadfcd9010130653eb2932ff0dbeb3c009558a8b7ce149baa5d980f74ce6",
+  "files": [
+    {
+      "archive_path": "Desafio Técnico AI Engineer 2026/data/desafio_tecnico_ai_eng - products.csv",
+      "path": "desafio_tecnico_ai_eng - products.csv",
+      "sha256": "78d911d96ee891abb163b6c858e895025aa530ab27d0290540f05d5098377c12",
+      "size_bytes": 22399
+    },
+    {
+      "archive_path": "Desafio Técnico AI Engineer 2026/data/desafio_tecnico_ai_eng - categories.csv",
+      "path": "desafio_tecnico_ai_eng - categories.csv",
+      "sha256": "7a7901e16c8c6357a956031ada45a6fd6a4cc9bd7bc1edc05448cc55b01b0a9e",
+      "size_bytes": 756
+    }
+  ]
+}
