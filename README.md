@@ -1,11 +1,11 @@
-# Empório da Música — customer-service assistant
+# Music Store — customer-service assistant
 
 Project for Artefact's **AI Engineer — Full-Stack for Generative AI Applications**
 technical challenge.
 
 ## The challenge
 
-Empório da Música is a fictional musical instrument store in Campo Grande, Brazil.
+Music Store is a fictional musical instrument store in Campo Grande, Brazil.
 Its team handles recurring customer questions about products, prices, availability
 and store policies.
 
