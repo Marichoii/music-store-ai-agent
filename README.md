@@ -17,10 +17,21 @@ the supplied CSV files and policy manual.
 - Handle follow-ups, missing information and out-of-scope requests.
 - Use a welcoming, informal and professional tone.
 
-## Planned approach
+## Stack
 
-**Python**, **Gemini** and **Streamlit**, with Python tools for data queries and
+**Python**, **Gemini** and **FastAPI**, with Python tools for data queries and
 business rules.
+
+## Run
+
+Set `GEMINI_API_KEY` in a local `.env`, using `.env.example` as a template.
+
+```bash
+uv sync --locked --extra dev
+uv run uvicorn music_store.api:app --host 127.0.0.1 --port 8000 --workers 1
+```
+
+Open [API docs](http://127.0.0.1:8000/docs). Details: [API usage](docs/api.md).
 
 ## AI assistance
 

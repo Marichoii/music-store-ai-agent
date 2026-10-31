@@ -6,12 +6,12 @@ Pydantic validates arguments before execution; the SDK never executes tools dire
 
 ```bash
 uv sync --locked --extra dev
-cp .env.example .env
 uv run python -m music_store --check-config
 uv run python -m music_store
 ```
 
-Set `GEMINI_API_KEY` locally before running. `GEMINI_MODEL` is configurable.
+Create `.env` from `.env.example` if missing and set `GEMINI_API_KEY`.
+`GEMINI_MODEL` is configurable. The HTTP interface is documented in [api.md](api.md).
 Configuration checks make no model requests. Chat sends messages and relevant
 source context to Google and consumes API quota.
 
