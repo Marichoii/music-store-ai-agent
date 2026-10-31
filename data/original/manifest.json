@@ -13,6 +13,12 @@
       "path": "desafio_tecnico_ai_eng - categories.csv",
       "sha256": "7a7901e16c8c6357a956031ada45a6fd6a4cc9bd7bc1edc05448cc55b01b0a9e",
       "size_bytes": 756
+    },
+    {
+      "archive_path": "Desafio Técnico AI Engineer 2026/data/desafio_tecnico_ai_eng - promotions.csv",
+      "path": "desafio_tecnico_ai_eng - promotions.csv",
+      "sha256": "cbe08c7e91b00437c0c00a7ef1486deba73de52d23e3f97f51a7dbd557d759e0",
+      "size_bytes": 839
     }
   ]
 }

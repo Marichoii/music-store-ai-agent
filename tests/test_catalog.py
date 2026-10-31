@@ -17,7 +17,7 @@ def catalog():
 
 @pytest.fixture
 def source_copy(tmp_path):
-    for table in ("products", "categories"):
+    for table in ("products", "categories", "promotions"):
         filename = f"desafio_tecnico_ai_eng - {table}.csv"
         shutil.copyfile(DEFAULT_DATA_DIR / filename, tmp_path / filename)
     return tmp_path
@@ -38,7 +38,7 @@ def change_first_record(directory: Path, table: str, field: str, value: str):
 
 def test_original_files_match_source_manifest():
     manifest = json.loads((DEFAULT_DATA_DIR / "manifest.json").read_text(encoding="utf-8"))
-    assert len(manifest["files"]) == 2
+    assert len(manifest["files"]) == 3
     for entry in manifest["files"]:
         raw = (DEFAULT_DATA_DIR / entry["path"]).read_bytes()
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
@@ -114,11 +114,12 @@ def test_empty_category_and_unknown_category_are_different(catalog):
         catalog.search(category_id=999)
 
 
-def test_budget_is_inclusive_and_uses_list_price(catalog):
+def test_budget_is_inclusive_and_uses_effective_price(catalog):
     product = catalog.get_product(81)
     assert product in catalog.search(max_price_brl=Decimal("599.90"))
     assert product not in catalog.search(max_price_brl=Decimal("599.89"))
-    assert catalog.get_product(121) not in catalog.search(max_price_brl=Decimal("500"))
+    assert catalog.get_product(121) in catalog.search(max_price_brl=Decimal("439.20"))
+    assert catalog.get_product(121) not in catalog.search(max_price_brl=Decimal("439.19"))
 
 
 @pytest.mark.parametrize("budget", [Decimal("-1"), Decimal("NaN"), Decimal("Infinity"), 1000.0])
