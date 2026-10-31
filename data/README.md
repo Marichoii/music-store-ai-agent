@@ -1,7 +1,7 @@
 # Catalog and pricing data
 
-`original/` contains the unmodified products, categories and promotions CSVs from
-the supplied challenge ZIP. Their archive paths and SHA-256 hashes are recorded in
+`original/` contains the unmodified products, categories and promotions CSVs and
+the policy PDF from the supplied challenge ZIP. Archive paths and SHA-256 hashes are recorded in
 `original/manifest.json`. Git line-ending conversion is disabled for these files.
 The remaining materials are preserved in the original ZIP and will be introduced
 as their features are implemented.
@@ -39,8 +39,11 @@ before multiplying by quantity. Quotes contain the original price, final unit
 price, percentage, discount source, promotion details and subtotal. Unavailable
 products and quantities beyond stock cannot be quoted.
 
-Quotes do not reserve stock, place orders or include freight. Installment
-schedules and combined-payment conditions are not implemented in this step.
+Quotes do not reserve stock, place orders or include freight. Credit quotes now
+include installment schedules with confirmation flags for conflicting minima;
+mixed-payment threshold and boleto conditions are also included. Full manual
+context and the assumptions behind those rules are documented in
+[policies.md](../docs/policies.md).
 
 ## Source inconsistency
 

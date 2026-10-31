@@ -68,6 +68,22 @@ class PriceBreakdown(Record):
     promotion: Promotion | None
 
 
+class InstallmentPlan(Record):
+    count: int
+    amounts_brl: tuple[Decimal, ...]
+    interest_percent: Decimal = Decimal("0")
+    requires_confirmation: bool
+    note: str
+
+
+class PaymentTerms(Record):
+    installment_options: tuple[InstallmentPlan, ...]
+    mixed_payment_threshold_met: bool
+    mixed_payment_note: str
+    boleto_clearance_up_to_business_days: int | None
+    source: str = "políticas_da_loja.pdf, sections 3 and 3.1, p. 3"
+
+
 class Quote(Record):
     product_id: int
     name: str
@@ -75,5 +91,6 @@ class Quote(Record):
     payment_method: PaymentMethod
     price: PriceBreakdown
     subtotal_brl: Decimal
+    payment_terms: PaymentTerms
     currency: Literal["BRL"] = "BRL"
     freight_included: bool = False

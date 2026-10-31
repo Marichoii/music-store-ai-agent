@@ -4,11 +4,7 @@ from collections.abc import Iterable
 from decimal import ROUND_HALF_UP, Decimal
 
 from music_store.models import PaymentMethod, PriceBreakdown, Product, Promotion, Quote
-
-
-def validate_payment_method(payment_method: PaymentMethod) -> None:
-    if payment_method not in ("standard", "pix", "debit", "credit", "boleto"):
-        raise ValueError("Unknown payment method.")
+from music_store.payments import payment_terms_for, validate_payment_method
 
 
 def money(value: Decimal) -> Decimal:
@@ -63,11 +59,13 @@ def quote_product(
     if quantity > product.stock_quantity:
         raise ValueError("Requested quantity exceeds the available stock.")
     price = price_for(product, promotions, payment_method)
+    subtotal = money(price.unit_price_brl * quantity)
     return Quote(
         product_id=product.product_id,
         name=product.name,
         quantity=quantity,
         payment_method=payment_method,
         price=price,
-        subtotal_brl=money(price.unit_price_brl * quantity),
+        subtotal_brl=subtotal,
+        payment_terms=payment_terms_for(subtotal, payment_method),
     )

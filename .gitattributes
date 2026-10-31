@@ -1,2 +1,3 @@
 # Preserve the original CSV bytes, including line endings.
 data/original/** -text
+*.pdf binary

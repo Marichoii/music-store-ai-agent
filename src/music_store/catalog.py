@@ -9,7 +9,8 @@ from types import MappingProxyType
 from pydantic import ValidationError
 
 from music_store.models import Category, PaymentMethod, Product, Promotion, Quote
-from music_store.pricing import price_for, quote_product, validate_payment_method
+from music_store.payments import validate_payment_method
+from music_store.pricing import price_for, quote_product
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[2] / "data/original"
 

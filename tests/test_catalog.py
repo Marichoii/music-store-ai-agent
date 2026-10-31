@@ -38,7 +38,7 @@ def change_first_record(directory: Path, table: str, field: str, value: str):
 
 def test_original_files_match_source_manifest():
     manifest = json.loads((DEFAULT_DATA_DIR / "manifest.json").read_text(encoding="utf-8"))
-    assert len(manifest["files"]) == 3
+    assert len(manifest["files"]) == 4
     for entry in manifest["files"]:
         raw = (DEFAULT_DATA_DIR / entry["path"]).read_bytes()
         assert hashlib.sha256(raw).hexdigest() == entry["sha256"]
