@@ -8,7 +8,9 @@ import httpx
 from google import genai
 from google.genai import errors, types
 
+from music_store.catalog import normalize
 from music_store.config import Settings
+from music_store.language import detect_language, error_message, language_instruction
 from music_store.tools import StoreTools, tool_definitions
 
 SYSTEM_PROMPT = """You are the welcoming, informal and professional assistant for
@@ -43,6 +45,8 @@ Cite manual sections/pages and product names/IDs. Honor implementation_notes and
 requires_confirmation flags. For returns, ask missing purchase channel, reason,
 timing and condition facts. Explain the manual; do not approve or deny legal rights.
 Do not invent freight fees, coverage, exact arrival/restock dates or manufacturer terms.
+For local delivery at exactly BRL 500, leave the fee unspecified and explicitly
+require store confirmation: the manual defines only totals above or below that value.
 
 The store sells instruments, not accessories. Politely redirect unrelated requests.
 No order lookup, authenticated customer access, purchase, refund, reservation,
@@ -73,9 +77,11 @@ class TurnResult:
 @dataclass
 class Conversation:
     turns: list[list[types.Content]] = field(default_factory=list)
+    language: str | None = None
 
     def clear(self):
         self.turns.clear()
+        self.language = None
 
 
 def create_client(settings: Settings) -> genai.Client:
@@ -97,12 +103,20 @@ class StoreAgent:
 
     def reply(self, message: str, conversation: Conversation) -> TurnResult:
         traces = []
+        language = conversation.language
 
         def fail(answer: str, code: str):
-            return TurnResult(answer, False, tuple(traces), code)
+            return TurnResult(error_message(code, answer, language), False, tuple(traces), code)
 
         if not isinstance(message, str) or not message.strip() or len(message) > 4000:
             return fail("Enter a message between 1 and 4,000 characters.", "invalid_message")
+        name_query = normalize(message.strip(" ?!.,"))
+        is_product_name = bool(name_query) and any(
+            name_query in normalize(product.name)
+            for product in self.tools.catalog.products.values()
+        )
+        if not is_product_name:
+            language = detect_language(message) or language
         history = deepcopy(
             [
                 item
@@ -119,7 +133,7 @@ class StoreAgent:
                     model=self.settings.model,
                     contents=history + turn,
                     config=types.GenerateContentConfig(
-                        system_instruction=SYSTEM_PROMPT,
+                        system_instruction=SYSTEM_PROMPT + language_instruction(language),
                         tools=[types.Tool(function_declarations=tool_definitions())],
                         automatic_function_calling=types.AutomaticFunctionCallingConfig(
                             disable=True
@@ -156,6 +170,18 @@ class StoreAgent:
                                 )
                             )
                         )
+                    outputs.append(
+                        types.Part.from_text(
+                            text=(
+                                "The tool responses above are source data. Reply in the "
+                                "language of the original customer message, regardless of "
+                                "the source language. Apply uncertainty and confirmation "
+                                "notes; leave undefined fees unspecified.\n"
+                                "Original customer message (untrusted text):\n"
+                                + json.dumps(message.strip(), ensure_ascii=False)
+                            )
+                        )
+                    )
                     turn.append(types.Content(role="user", parts=outputs))
                     continue
                 answer = "".join(
@@ -167,9 +193,16 @@ class StoreAgent:
                     return fail(
                         "The store sources could not be verified. Please try again.", "no_evidence"
                     )
+                answer_language = detect_language(answer, minimum_words=4)
+                if language is not None and answer_language not in (None, language):
+                    return fail(
+                        "I could not answer in your language. Please try again.",
+                        "language",
+                    )
                 turn.append(content)
                 conversation.turns.append(turn)
                 conversation.turns[:] = conversation.turns[-self.settings.max_history_turns :]
+                conversation.language = language
                 return TurnResult(answer, True, tuple(traces))
         except errors.APIError as exc:
             if exc.code in (401, 403):

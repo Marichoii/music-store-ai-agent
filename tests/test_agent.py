@@ -86,6 +86,67 @@ def test_sessions_are_isolated_and_resettable(store_tools):
     assert not first.turns and len(second.turns) == 1
 
 
+def test_tool_follow_up_uses_current_customer_message_when_language_switches(store_tools):
+    current, client = agent(
+        store_tools,
+        tool_response(),
+        text_response(),
+        tool_response(),
+        text_response("O valor foi consultado no catálogo da loja."),
+    )
+    session = Conversation()
+    first_message = "How much is the Yamaha C40?"
+    second_message = "E no PIX, quanto fica?"
+    assert current.reply(first_message, session).ok
+    assert current.reply(second_message, session).ok
+    first_reminder = client.requests[1]["contents"][-1].parts[-1].text
+    second_reminder = client.requests[3]["contents"][-1].parts[-1].text
+    assert first_reminder.endswith(json.dumps(first_message, ensure_ascii=False))
+    assert second_reminder.endswith(json.dumps(second_message, ensure_ascii=False))
+    assert first_message not in second_reminder
+    assert client.requests[3]["contents"][-1].parts[0].function_response.id == "call-1"
+    assert client.requests[3]["config"].system_instruction.endswith("in Portuguese.")
+    assert session.language == "pt"
+
+
+def test_wrong_language_is_rejected_without_saving_the_turn(store_tools):
+    current, _ = agent(
+        store_tools,
+        tool_response(),
+        text_response("O horário está no manual de políticas da loja."),
+    )
+    session = Conversation()
+    result = current.reply("What are your opening hours?", session)
+    assert not result.ok and result.error_code == "language"
+    assert not session.turns and session.language is None
+
+
+def test_product_name_keeps_portuguese_and_provider_failure_is_localized(store_tools):
+    current, client = agent(
+        store_tools,
+        tool_response(query="144"),
+        text_response("O nome e a descrição do produto têm marcas diferentes."),
+        errors.ClientError(429, {"error": {"message": "private-detail"}}),
+    )
+    session = Conversation(language="pt")
+    assert current.reply("Roland Synth 3 Pro", session).ok
+    assert client.requests[0]["config"].system_instruction.endswith("in Portuguese.")
+    result = current.reply("Quanto custa?", session)
+    assert not result.ok and result.error_code == "rate_limit"
+    assert result.answer == "O limite de uso do Gemini foi atingido. Tente novamente mais tarde."
+    assert len(session.turns) == 1 and session.language == "pt"
+    session.clear()
+    assert session.language is None
+
+
+def test_short_english_question_switches_away_from_portuguese(store_tools):
+    current, client = agent(store_tools, tool_response(), text_response())
+    session = Conversation(language="pt")
+    assert current.reply("And is it available?", session).ok
+    assert client.requests[0]["config"].system_instruction.endswith("in English.")
+    assert session.language == "en"
+
+
 def test_history_trimming_preserves_call_pairs_and_signatures(store_tools):
     current, client = agent(
         store_tools,
@@ -209,6 +270,7 @@ def test_actual_google_sdk_with_mock_http_transport(store_tools):
     assert parts[0]["thoughtSignature"]
     output = requests[1]["contents"][-1]["parts"][0]["functionResponse"]
     assert output["id"] == "call-1" and output["response"]["data"]["product"]["product_id"] == 81
+    assert requests[1]["contents"][-1]["parts"][-1]["text"].endswith('"Price?"')
 
 
 def test_missing_key_is_actionable_and_secret_repr_is_hidden():

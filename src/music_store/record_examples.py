@@ -8,6 +8,8 @@ from uuid import UUID
 
 import httpx
 
+from music_store.api import ChatResponse
+
 SCENARIOS = {
     "budget": (
         "I'm looking for a nylon-string acoustic guitar under R$700. What is available?",
@@ -35,6 +37,36 @@ class RecordingError(ValueError):
     pass
 
 
+def render_markdown(transcript: dict) -> str:
+    lines = [
+        f"# {transcript['scenario'].replace('_', ' ').title()}",
+        "",
+        f"Recorded: {transcript['recorded_at']}",
+        f"Endpoint: `{transcript['endpoint']}`",
+        f"Status: **{transcript['status']}**",
+    ]
+    for number, turn in enumerate(transcript["turns"], 1):
+        lines.extend(
+            [
+                "",
+                f"## Turn {number}",
+                "",
+                "**Customer**",
+                "",
+                turn["user"],
+                "",
+                "**Assistant**",
+                "",
+                turn.get("assistant", "_No answer received._"),
+                "",
+                "Sources: " + ", ".join(f"`{name}`" for name in turn.get("sources", [])),
+            ]
+        )
+    if "error" in transcript:
+        lines.extend(["", f"Recording error: {transcript['error']}"])
+    return "\n".join(lines) + "\n"
+
+
 def record_conversation(client: httpx.Client, path: Path, messages: tuple[str, ...]):
     transcript = {
         "scenario": path.stem,
@@ -55,15 +87,19 @@ def record_conversation(client: httpx.Client, path: Path, messages: tuple[str, .
             turn["http_status"] = response.status_code
             if response.is_error:
                 try:
-                    session_id = str(UUID(response.json()["detail"]["session_id"]))
+                    detail = response.json()["detail"]
+                    if isinstance(detail, dict) and isinstance(detail.get("code"), str):
+                        turn["error_code"] = detail["code"]
+                    session_id = str(UUID(detail["session_id"]))
                 except (KeyError, TypeError, ValueError):
                     pass
                 raise RecordingError(f"Chat returned HTTP {response.status_code}.")
-            result = response.json()
-            if session_id is not None and session_id != result["session_id"]:
+            result = ChatResponse.model_validate(response.json())
+            identifier = str(result.session_id)
+            if session_id is not None and session_id != identifier:
                 raise RecordingError("The API changed the conversation's session ID.")
-            session_id = result["session_id"]
-            turn.update(assistant=result["answer"], sources=result["sources"])
+            session_id = identifier
+            turn.update(assistant=result.answer, sources=result.sources)
         transcript["status"] = "complete"
     except (httpx.HTTPError, KeyError, TypeError, ValueError) as exc:
         message = (
@@ -72,21 +108,26 @@ def record_conversation(client: httpx.Client, path: Path, messages: tuple[str, .
         transcript["error"] = message
         raise RecordingError(message) from None
     finally:
-        with path.open("x", encoding="utf-8") as output:
-            json.dump(transcript, output, ensure_ascii=False, indent=2)
-            output.write("\n")
-        if session_id is not None:
-            try:
-                client.delete(f"/sessions/{session_id}", timeout=10)
-            except httpx.HTTPError:
-                pass
+        try:
+            with path.open("x", encoding="utf-8") as output:
+                json.dump(transcript, output, ensure_ascii=False, indent=2)
+                output.write("\n")
+            with path.with_suffix(".md").open("x", encoding="utf-8") as output:
+                output.write(render_markdown(transcript))
+        finally:
+            if session_id is not None:
+                try:
+                    client.delete(f"/sessions/{session_id}", timeout=10)
+                except httpx.HTTPError:
+                    pass
 
 
 def record_examples(client: httpx.Client, output: Path, scenario: str | None = None) -> Path:
     try:
         response = client.get("/health")
         response.raise_for_status()
-        if response.json().get("agent_configured") is not True:
+        health = response.json()
+        if not isinstance(health, dict) or health.get("agent_configured") is not True:
             raise RecordingError("The API agent is not configured. Check GEMINI_API_KEY.")
     except (httpx.HTTPError, ValueError) as exc:
         if isinstance(exc, RecordingError):

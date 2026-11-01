@@ -1,0 +1,25 @@
+{
+  "scenario": "budget",
+  "recorded_at": "2026-11-01T00:46:15.420356+00:00",
+  "endpoint": "http://127.0.0.1:54029/chat",
+  "status": "complete",
+  "turns": [
+    {
+      "user": "I'm looking for a nylon-string acoustic guitar under R$700. What is available?",
+      "http_status": 200,
+      "assistant": "Welcome to Empório da Música! We have a few great nylon-string acoustic guitars available under R$700.00:\n\n- **Tagima Memphis AC-39 Nylon Natural** (ID: 83) – R$ 429,90\n- **Rozini RC-104 Nylon Estudante** (ID: 85) – R$ 459,90\n- **Yamaha C40 Nylon Natural** (ID: 81) – R$ 599,90\n- **Giannini GN-15 Nylon Cedr Natural** (ID: 84) – R$ 689,00\n\nLet me know if you would like more details or a price quote for any of these models!",
+      "sources": [
+        "list_categories",
+        "search_catalog"
+      ]
+    },
+    {
+      "user": "Which of those is cheapest if I pay by PIX? Quote the price for one.",
+      "http_status": 200,
+      "assistant": "The cheapest option is the **Tagima Memphis AC-39 Nylon Natural** (ID: 83). \n\nHere is the quote for 1 unit paid via PIX:\n- **Original Price:** R$ 429,90\n- **PIX Discount:** 5%\n- **Final Price:** R$ 408,41\n\n*(Note: Never stack PIX and promotional discounts according to store policy.)*",
+      "sources": [
+        "quote_product"
+      ]
+    }
+  ]
+}
